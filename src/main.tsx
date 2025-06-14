@@ -4,11 +4,15 @@ import './index.css'
 import { Provider } from './components/ui/provider'
 import { RouterProvider } from 'react-router-dom'
 import router from './router/routes'
-
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+const queryClient = new QueryClient();
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <Provider>
-      <RouterProvider router={router}/>
+      <QueryClientProvider client={queryClient}>
+        <RouterProvider router={router}/>
+      </QueryClientProvider>
+      
     </Provider>
   </StrictMode>,
 )
