@@ -34,7 +34,7 @@ const EmployeesTable = () => {
             >
               <Table.Root size="sm" stickyHeader>
                 <Table.Header>
-                  <Table.Row bg="bg.subtle">
+                  <Table.Row bg="bg.subtle" zIndex="-1">
                     <Table.ColumnHeader></Table.ColumnHeader>
                     <Table.ColumnHeader>Full Name</Table.ColumnHeader>
                     <Table.ColumnHeader>Department</Table.ColumnHeader>
