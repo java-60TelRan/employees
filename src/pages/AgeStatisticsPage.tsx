@@ -3,6 +3,7 @@ import { Employee } from "../model/dto-types"
 import { useQuery } from "@tanstack/react-query"
 import apiClient from "../services/ApiClientJsonServer"
 import Statistics from "../components/Statistics"
+import { getAge } from "../util/functions"
 
 const AgeStatisticsPage = () => {
  const {data: employees} = useQuery<Employee[], AxiosError>({
@@ -12,7 +13,7 @@ const AgeStatisticsPage = () => {
    })
  
    return (
-     <Statistics numbers={employees?.map(e => new Date().getFullYear() - new Date(e.birthDate).getFullYear()) || []} interval={10} label={'Age'} ></Statistics>
+     <Statistics numbers={employees?.map(e => getAge(e.birthDate)) || []} interval={10} label={'Age'} ></Statistics>
    )
  }
 
