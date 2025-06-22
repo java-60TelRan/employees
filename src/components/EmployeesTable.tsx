@@ -6,6 +6,7 @@ import { AxiosError } from "axios";
 import { useColorModeValue } from "../components/ui/color-mode";
 import { FC } from "react";
 import useEmployeesMutation from "../hooks/useEmployeesMutation";
+import EditField from "./EditField";
 interface Props {
   deleteFn: MutationFunction
 }
@@ -64,8 +65,12 @@ const EmployeesTable:FC<Props> = ({deleteFn}) => {
                         </Avatar.Root>
                       </Table.Cell>
                       <Table.Cell >{empl.fullName}</Table.Cell>
-                      <Table.Cell>{empl.department}</Table.Cell>
-                      <Table.Cell hideBelow="sm">{empl.salary}</Table.Cell>
+                      <Table.Cell>
+                        <EditField field="department" oldValue={empl.department} submitter={(data)=>console.log(data)}/>
+                      </Table.Cell>
+                      <Table.Cell hideBelow="sm">
+                        <EditField field="salary" oldValue={empl.salary} submitter={(data)=>console.log(data)}/>
+                      </Table.Cell>
                       <Table.Cell hideBelow="md">{empl.birthDate}</Table.Cell>
                       <Table.Cell >
                         <Button size="xs" background={bg} onClick={() => mutationDel.mutate(empl.id)} disabled={mutationDel.isPending}>Delete</Button>
