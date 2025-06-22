@@ -8,9 +8,10 @@ import { FC } from "react";
 import useEmployeesMutation from "../hooks/useEmployeesMutation";
 import EditField from "./EditField";
 interface Props {
-  deleteFn: MutationFunction
+  deleteFn: MutationFunction,
+  updateFn: MutationFunction
 }
-const EmployeesTable:FC<Props> = ({deleteFn}) => {
+const EmployeesTable:FC<Props> = ({deleteFn, updateFn}) => {
   const {
     data: employees,
     error,
@@ -21,6 +22,7 @@ const EmployeesTable:FC<Props> = ({deleteFn}) => {
     staleTime: 3600_000
   });
   const mutationDel = useEmployeesMutation(deleteFn);
+  const mutationUpdate = useEmployeesMutation(updateFn);
   const bg = useColorModeValue("red.500", "red.200");
   return (
     <>
@@ -66,10 +68,12 @@ const EmployeesTable:FC<Props> = ({deleteFn}) => {
                       </Table.Cell>
                       <Table.Cell >{empl.fullName}</Table.Cell>
                       <Table.Cell>
-                        <EditField field="department" oldValue={empl.department} submitter={(data)=>console.log(data)}/>
+                        <EditField field="department" oldValue={empl.department} submitter={(data)=>
+            mutationUpdate.mutate({id: empl.id, fields: data})}/>
                       </Table.Cell>
                       <Table.Cell hideBelow="sm">
-                        <EditField field="salary" oldValue={empl.salary} submitter={(data)=>console.log(data)}/>
+                        <EditField field="salary" oldValue={empl.salary} submitter={(data)=>
+                          mutationUpdate.mutate({id: empl.id, fields: data})}/>
                       </Table.Cell>
                       <Table.Cell hideBelow="md">{empl.birthDate}</Table.Cell>
                       <Table.Cell >

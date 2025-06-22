@@ -22,6 +22,8 @@ const axiosIstance = axios.create({
         return res.data
     }
     async getAll(searchObject?: SearchObject): Promise<Employee[]> {
+        //TODO
+        //rewrite the method with taking in consideration possible searchObject
         const res = await axiosIstance.get<Employee[]>("/");
         return res.data;
     }
