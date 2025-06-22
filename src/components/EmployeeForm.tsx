@@ -57,7 +57,7 @@ const EmployeeForm: FC<Props> = ({ submitter }) => {
         </Field.Root>
         <Field.Root invalid={!!errors.salary}width="80%">
           <Field.Label>Salary</Field.Label>
-          <Input {...register("salary",{required: true, min: employeesConfig.minSalary,
+          <Input {...register("salary",{required: true, valueAsNumber: true, min: employeesConfig.minSalary,
              max: employeesConfig.maxSalary})}type="number" size="sm" placeholder={`enetr salary [${employeesConfig.minSalary}-${employeesConfig.maxSalary}]`}/>
           <Field.ErrorText>{`Salary must be in the range [${employeesConfig.minSalary}-${employeesConfig.maxSalary}]`}</Field.ErrorText>
         </Field.Root>

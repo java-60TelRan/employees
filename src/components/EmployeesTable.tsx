@@ -68,7 +68,7 @@ const EmployeesTable:FC<Props> = ({deleteFn}) => {
                       <Table.Cell hideBelow="sm">{empl.salary}</Table.Cell>
                       <Table.Cell hideBelow="md">{empl.birthDate}</Table.Cell>
                       <Table.Cell >
-                        <Button size="xs" background={bg} onClick={() => mutationDel.mutate(empl.id)}>Delete</Button>
+                        <Button size="xs" background={bg} onClick={() => mutationDel.mutate(empl.id)} disabled={mutationDel.isPending}>Delete</Button>
                       </Table.Cell>
                     </Table.Row>
                   ))}
