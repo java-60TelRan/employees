@@ -1,9 +1,12 @@
-import React from 'react'
+
+import {
+  minSalary,
+  maxSalary
+} from "../../config/employees-config.json";
+import RangeFilter from "./RangeFilter";
 
 const SalaryFilter = () => {
-  return (
-    <div>SalaryFilter</div>
-  )
-}
+  return <RangeFilter title="salary" min={minSalary} max={maxSalary}/>
+};
 
-export default SalaryFilter
+export default SalaryFilter;

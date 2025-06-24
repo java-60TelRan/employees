@@ -1,5 +1,5 @@
 import { MutationFunction, useQuery } from "@tanstack/react-query";
-import { Employee } from "../model/dto-types";
+import { Employee, SearchObject } from "../model/dto-types";
 import apiClient from "../services/ApiClientJsonServer";
 import { Avatar, Spinner, Stack, Table, Text, Button} from "@chakra-ui/react";
 import { AxiosError } from "axios";
@@ -7,18 +7,32 @@ import { useColorModeValue } from "../components/ui/color-mode";
 import { FC } from "react";
 import useEmployeesMutation from "../hooks/useEmployeesMutation";
 import EditField from "./EditField";
+import useEmployeeFilters from "../state-management/store";
+import _ from 'lodash'
 interface Props {
   deleteFn: MutationFunction,
   updateFn: MutationFunction
 }
 const EmployeesTable:FC<Props> = ({deleteFn, updateFn}) => {
+  const {department, salaryFrom, salaryTo, ageFrom, ageTo} = useEmployeeFilters();
+  let searchObj: SearchObject | undefined = {};
+  department && (searchObj.department = department);
+  salaryFrom && (searchObj.salaryFrom = salaryFrom);
+  salaryTo && (searchObj.salaryTo = salaryTo);
+  ageFrom && (searchObj.ageFrom = ageFrom);
+  ageTo && (searchObj.ageTo = ageTo);
+  if (_.isEmpty(searchObj)) {
+    searchObj = undefined
+  }
+  const queryKey: any[] = ["employees"]
+  searchObj && queryKey.push(searchObj)
   const {
     data: employees,
     error,
     isLoading,
   } = useQuery<Employee[], AxiosError>({
-    queryKey: ["employees"],
-    queryFn: () => apiClient.getAll(),
+    queryKey,
+    queryFn: () => apiClient.getAll(searchObj),
     staleTime: 3600_000
   });
   const mutationDel = useEmployeesMutation(deleteFn);
@@ -39,7 +53,7 @@ const EmployeesTable:FC<Props> = ({deleteFn, updateFn}) => {
             <Table.ScrollArea
               borderWidth="1px"
               rounded="md"
-              height="80vh"
+              height="70vh"
               width={{
                 base:"100vw",
                 sm:"95vw",
