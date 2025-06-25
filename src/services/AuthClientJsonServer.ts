@@ -15,8 +15,9 @@ class AuthClientJsonServer implements AuthClient {
         const userData: UserData = {email: user.email, role: user.id, token: accessToken};
         return userData;
     }
-    logout(email: string): Promise<void> {
-        throw new Error("Method not implemented.");
+    async logout(_: string): Promise<void> {
     }
 
 }
+const authClient = new AuthClientJsonServer();
+export default authClient;
