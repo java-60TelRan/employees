@@ -36,14 +36,15 @@ const EmployeesTable:FC<Props> = ({deleteFn, updateFn}) => {
     queryFn: () => apiClient.getAll(searchObj),
     staleTime: 3600_000
   });
+  if (error) {
+    throw error;
+  }
   const mutationDel = useEmployeesMutation(deleteFn);
   const mutationUpdate = useEmployeesMutation(updateFn);
   const bg = useColorModeValue("red.500", "red.200");
   return (
     <>
-      {error ? 
-        <Text color={"red"} fontSize={"2xl"}>{error.message}</Text>
-      : 
+     
         <>
           {isLoading && <Spinner />}
           <Stack
@@ -101,7 +102,6 @@ const EmployeesTable:FC<Props> = ({deleteFn, updateFn}) => {
             </Table.ScrollArea>
           </Stack>
         </>
-      }
     </>
   );
 };
