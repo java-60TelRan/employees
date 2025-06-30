@@ -4,11 +4,12 @@ import apiClient from "../services/ApiClientJsonServer";
 import { Avatar, Spinner, Stack, Table, Text, Button} from "@chakra-ui/react";
 import { AxiosError } from "axios";
 import { useColorModeValue } from "../components/ui/color-mode";
-import { FC } from "react";
+import { FC, useEffect, useMemo } from "react";
 import useEmployeesMutation from "../hooks/useEmployeesMutation";
 import EditField from "./EditField";
-import useEmployeeFilters, { useAuthData } from "../state-management/store";
-import _ from 'lodash'
+import useEmployeeFilters, { useAuthData, useEmployeesPagination } from "../state-management/store";
+import _ from 'lodash';
+import {pageSize} from '../../config/employees-config.json'
 interface Props {
   deleteFn: MutationFunction,
   updateFn: MutationFunction
@@ -42,6 +43,26 @@ const EmployeesTable:FC<Props> = ({deleteFn, updateFn}) => {
   const mutationDel = useEmployeesMutation(deleteFn);
   const mutationUpdate = useEmployeesMutation(updateFn);
   const bg = useColorModeValue("red.500", "red.200");
+  const page = useEmployeesPagination(s => s.page);
+  const setCount = useEmployeesPagination(s => s.setCount);
+  const setPage = useEmployeesPagination(s => s.setPage);
+  useEffect (() => {
+    const count = employees?.length || 0;
+    setCount(count);
+    if((page - 1) * pageSize >= count) {
+      setPage(1);
+    }
+
+  }, [employees])
+  const {startIndex, endIndex} = useMemo(() => {
+    const startIndex = (page - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    return {startIndex, endIndex}
+  }, [page])
+  function getEmployeesOnPage(employees: Employee[]) {
+   return employees.slice(startIndex, endIndex)
+  }
+
   return (
     <>
      
@@ -74,7 +95,7 @@ const EmployeesTable:FC<Props> = ({deleteFn, updateFn}) => {
                   </Table.Row>
                 </Table.Header>
                 <Table.Body  zIndex="-100">
-                  {employees?.map((empl) => (
+                  {employees && getEmployeesOnPage(employees).map((empl) => (
                     <Table.Row key={empl.id} >
                       <Table.Cell hideBelow={"md"}>
                         <Avatar.Root shape="full" size="lg">
