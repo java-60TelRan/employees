@@ -1,7 +1,7 @@
 import { MutationFunction, useQuery } from "@tanstack/react-query";
 import { Employee, SearchObject } from "../model/dto-types";
 import apiClient from "../services/ApiClientJsonServer";
-import { Avatar, Spinner, Stack, Table, Text, Button} from "@chakra-ui/react";
+import { Avatar, Spinner, Stack, Table,  Button} from "@chakra-ui/react";
 import { AxiosError } from "axios";
 import { useColorModeValue } from "../components/ui/color-mode";
 import { FC, useEffect, useMemo } from "react";
@@ -114,7 +114,12 @@ const EmployeesTable:FC<Props> = ({deleteFn, updateFn}) => {
                       </Table.Cell>
                       <Table.Cell hideBelow="md">{empl.birthDate}</Table.Cell>
                      { userData?.role === "ADMIN" && <Table.Cell >
-                        <Button size="xs" background={bg} onClick={() => mutationDel.mutate(empl.id)} disabled={mutationDel.isPending}>Delete</Button>
+                        <Button size="xs" background={bg} onClick={() => {
+                          if (confirm(`You are going to delete employee ${empl.fullName}`)) {
+                            mutationDel.mutate(empl.id)
+                          }
+                          
+                          }} disabled={mutationDel.isPending}>Delete</Button>
                       </Table.Cell>}
                     </Table.Row>
                   ))}
