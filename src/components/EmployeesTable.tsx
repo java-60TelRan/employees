@@ -4,7 +4,7 @@ import apiClient from "../services/ApiClientJsonServer";
 import { Avatar, Spinner, Stack, Table,  Button} from "@chakra-ui/react";
 import { AxiosError } from "axios";
 import { useColorModeValue } from "../components/ui/color-mode";
-import { FC, useEffect, useMemo } from "react";
+import { FC, useCallback, useEffect, useMemo } from "react";
 import useEmployeesMutation from "../hooks/useEmployeesMutation";
 import EditField from "./EditField";
 import useEmployeeFilters, { useAuthData, useEmployeesPagination } from "../state-management/store";
@@ -46,14 +46,15 @@ const EmployeesTable:FC<Props> = ({deleteFn, updateFn}) => {
   const page = useEmployeesPagination(s => s.page);
   const setCount = useEmployeesPagination(s => s.setCount);
   const setPage = useEmployeesPagination(s => s.setPage);
-  useEffect (() => {
+  const settings = useCallback (() => {
     const count = employees?.length || 0;
     setCount(count);
     if((page - 1) * pageSize >= count) {
       setPage(1);
     }
 
-  }, [employees])
+  }, [employees]);
+  settings();
   const {startIndex, endIndex} = useMemo(() => {
     const startIndex = (page - 1) * pageSize;
     const endIndex = startIndex + pageSize;
