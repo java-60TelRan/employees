@@ -1,48 +1,30 @@
-import { MutationFunction, useQuery } from "@tanstack/react-query";
-import { Employee, SearchObject } from "../model/dto-types";
-import apiClient from "../services/ApiClientJsonServer";
-import { Avatar, Spinner, Stack, Table,  Button} from "@chakra-ui/react";
-import { AxiosError } from "axios";
-import { useColorModeValue } from "../components/ui/color-mode";
+import { MutationFunction, QueryFunction } from "@tanstack/react-query";
+import { Employee } from "../model/dto-types";
+import { Avatar,  Stack, Table,   HStack, SkeletonCircle, Skeleton} from "@chakra-ui/react";
 import { FC, useEffect, useMemo } from "react";
 import useEmployeesMutation from "../hooks/useEmployeesMutation";
 import EditField from "./EditField";
-import useEmployeeFilters, { useAuthData, useEmployeesPagination } from "../state-management/store";
 import _ from 'lodash';
 import {pageSize} from '../../config/employees-config.json'
+import ConfirmDialog from "./ConfirmDialog";
+import { useAuthData, useEmployeesPagination } from "../state-management/store";
+import useEmployeesQuery from "../hooks/useEmployeesQuery";
 interface Props {
   deleteFn: MutationFunction,
-  updateFn: MutationFunction
+  updateFn: MutationFunction,
+  queryFn: QueryFunction<Employee[]>,
+  queryKey: any[]
 }
-const EmployeesTable:FC<Props> = ({deleteFn, updateFn}) => {
-  const {department, salaryFrom, salaryTo, ageFrom, ageTo} = useEmployeeFilters();
+const EmployeesTable:FC<Props> = ({deleteFn, updateFn, queryFn, queryKey}) => {
   const userData = useAuthData(s => s.userData);
-  let searchObj: SearchObject | undefined = {};
-  department && (searchObj.department = department);
-  salaryFrom && (searchObj.salaryFrom = salaryFrom);
-  salaryTo && (searchObj.salaryTo = salaryTo);
-  ageFrom && (searchObj.ageFrom = ageFrom);
-  ageTo && (searchObj.ageTo = ageTo);
-  if (_.isEmpty(searchObj)) {
-    searchObj = undefined
-  }
-  const queryKey: any[] = ["employees"]
-  searchObj && queryKey.push(searchObj)
+ 
   const {
     data: employees,
-    error,
-    isLoading,
-  } = useQuery<Employee[], AxiosError>({
-    queryKey,
-    queryFn: () => apiClient.getAll(searchObj),
-    staleTime: 3600_000
-  });
-  if (error) {
-    throw error;
-  }
+  } = useEmployeesQuery(queryKey, queryFn)
+  
   const mutationDel = useEmployeesMutation(deleteFn);
   const mutationUpdate = useEmployeesMutation(updateFn);
-  const bg = useColorModeValue("red.500", "red.200");
+  
   const page = useEmployeesPagination(s => s.page);
   const setCount = useEmployeesPagination(s => s.setCount);
   const setPage = useEmployeesPagination(s => s.setPage);
@@ -69,7 +51,7 @@ const EmployeesTable:FC<Props> = ({deleteFn, updateFn}) => {
     <>
      
         <>
-          {isLoading && <Spinner />}
+          
           <Stack
             height={"100%"}
             justifyContent={"center"}
@@ -97,6 +79,14 @@ const EmployeesTable:FC<Props> = ({deleteFn, updateFn}) => {
                   </Table.Row>
                 </Table.Header>
                 <Table.Body  zIndex="-100">
+                  {!employees && Array.from({length:pageSize}, () => <HStack gap="5">
+      <SkeletonCircle size="12" />
+      
+        <Skeleton height="5" width="80%" />
+        <Skeleton height="5" width="80%" />
+        <Skeleton height="5" width="80%" />
+        <Skeleton height="5" width="80%" />
+    </HStack>)}
                   {employees && getEmployeesOnPage(employees).map((empl) => (
                     <Table.Row key={empl.id} >
                       <Table.Cell hideBelow={"md"}>
@@ -116,18 +106,16 @@ const EmployeesTable:FC<Props> = ({deleteFn, updateFn}) => {
                       </Table.Cell>
                       <Table.Cell hideBelow="md">{empl.birthDate}</Table.Cell>
                      { userData?.role === "ADMIN" && <Table.Cell >
-                        <Button size="xs" background={bg} onClick={() => {
-                          if (confirm(`You are going to delete employee ${empl.fullName}`)) {
-                            mutationDel.mutate(empl.id)
-                          }
-                          
-                          }} disabled={mutationDel.isPending}>Delete</Button>
+                       <ConfirmDialog content={`Deleting employee ${empl.fullName}` } onClose={(isDelete) => {
+                        isDelete && mutationDel.mutate(empl.id)
+                       }} isPending={mutationDel.isPending}></ConfirmDialog>
                       </Table.Cell>}
                     </Table.Row>
                   ))}
                 </Table.Body>
               </Table.Root>
             </Table.ScrollArea>
+           
           </Stack>
         </>
     </>
